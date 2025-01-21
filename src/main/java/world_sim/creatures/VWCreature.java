@@ -1,35 +1,13 @@
 package world_sim.creatures;
 
 public class VWCreature implements ICreature {
-    protected int _x, _y, _strength, _initiative, _age = 0;
+    protected int _strength, _initiative, _age = 0;
     protected String _symbol;
 
-    public VWCreature(int x, int y, int strength, int initiative, String symbol) {
-        _x = x;
-        _y = y;
+    public VWCreature(int strength, int initiative, String symbol) {
         _strength = strength;
         _initiative = initiative;
         _symbol = symbol;
-    }
-
-    @Override
-    public int getX() {
-        return _x;
-    }
-
-    @Override
-    public void setX(int value) {
-        _x = value;
-    }
-
-    @Override
-    public int getY() {
-        return _y;
-    }
-
-    @Override
-    public void setY(int value) {
-        _y = value;
     }
 
     @Override

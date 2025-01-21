@@ -6,6 +6,7 @@ import world_sim.components.virtualWorld.exceptions.InvalidWorldSizeException;
 import world_sim.components.virtualWorld.exceptions.PointOutOfWorldSizeException;
 import world_sim.creatures.CreatureMap;
 import world_sim.creatures.ICreature;
+import world_sim.creatures.Wolf;
 import world_sim.creatures.exceptions.OccupiedFieldInsertException;
 
 import java.awt.*;
@@ -18,6 +19,8 @@ public class VirtualWorld {
     private final JPanel _gridPanel;
     private final JLabel[][] _gridCells;
     private final CreatureMap _creatureMap;
+    private final Random _random = new Random();
+    private ICreature _selectedCreature = new Wolf();
 
     public VirtualWorld(int sizeX, int sizeY) throws InvalidWorldSizeException {
         if (sizeX < 2 || sizeY < 2)
@@ -43,7 +46,13 @@ public class VirtualWorld {
                     public void mouseClicked(MouseEvent e) {
                         int x = (int) cell.getClientProperty("x");
                         int y = (int) cell.getClientProperty("y");
-                        // tutaj dodanie stworka
+
+                        try {
+                            _creatureMap.addCreature(x, y, _selectedCreature);
+                        } catch (OccupiedFieldInsertException e1) {
+                            e1.printStackTrace();
+                        }
+
                         updateCells();
                     }
                 });
@@ -52,15 +61,17 @@ public class VirtualWorld {
                 _gridPanel.add(_gridCells[i][j]);
             }
         }
+
+        _random.setSeed(System.currentTimeMillis());
     }
 
-    public void setCell(ICreature creature)
+    public void setCell(int x, int y, ICreature creature)
             throws PointOutOfWorldSizeException, OccupiedFieldInsertException {
-        if (creature.getX() < 0 || creature.getX() > _sizeX - 1 || creature.getY() < 0 || creature.getY() > _sizeY - 1)
+        if (x < 0 || x > _sizeX - 1 || y < 0 || y > _sizeY - 1)
             throw new PointOutOfWorldSizeException("Given cell is out of world bounds.");
 
-        _creatureMap.addCreature(creature);
-        _gridCells[creature.getX()][creature.getY()].setText(creature.getSymbol());
+        _creatureMap.addCreature(x, y, creature);
+        _gridCells[x][y].setText(creature.getSymbol());
     }
 
     public JPanel getJPanel() {
@@ -71,26 +82,28 @@ public class VirtualWorld {
         return _round;
     }
 
+    public void setSelectedCreature(ICreature creature) {
+        _selectedCreature = creature;
+    }
+
     public void nextRound() {
         for (int i = 0; i < _creatureMap.getCreaturesCount(); i++) {
-            var creature = _creatureMap.getCreature(i);
-            var random = new Random();
-            random.setSeed(System.currentTimeMillis() / 1000L);
-            var randomX = random.nextInt(-1, 1);
-            var randomY = random.nextInt(-1, 1);
+            var creatureField = _creatureMap.getField(i);
+            var randomX = _random.nextInt(-1, 2);
+            var randomY = _random.nextInt(-1, 2);
 
-            var newX = creature.getX() + randomX;
-            var newY = creature.getY() + randomY;
+            var newX = creatureField.getX() + randomX;
+            var newY = creatureField.getY() + randomY;
 
             if (newX < 0 || newX >= _sizeX)
-                newX = creature.getX();
+                newX = creatureField.getX();
             if (newY < 0 || newY >= _sizeY)
-                newY = creature.getY();
+                newY = creatureField.getY();
 
             var creatureOnField = _creatureMap.getCreature(newX, newY);
             if (creatureOnField == null) {
-                creature.setX(newX);
-                creature.setY(newY);
+                creatureField.setX(newX);
+                creatureField.setY(newY);
             }
         }
 
