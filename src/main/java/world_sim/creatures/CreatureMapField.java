@@ -2,9 +2,9 @@ package world_sim.creatures;
 
 public class CreatureMapField {
     private int _x, _y;
-    private ICreature _creature;
+    private VWCreature _creature;
 
-    public CreatureMapField(int x, int y, ICreature creature) {
+    public CreatureMapField(int x, int y, VWCreature creature) {
         _x = x;
         _y = y;
         _creature = creature;
@@ -26,7 +26,7 @@ public class CreatureMapField {
         _y = value;
     }
 
-    public ICreature getCreature() {
+    public VWCreature getCreature() {
         return _creature;
     }
 }

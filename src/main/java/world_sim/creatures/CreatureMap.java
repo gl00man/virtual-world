@@ -32,7 +32,7 @@ public class CreatureMap {
         return _sizeY;
     }
 
-    public ICreature getCreature(int x, int y) {
+    public VWCreature getCreature(int x, int y) {
         CreatureMapField field = _map.stream()
                 .filter(f -> f.getX() == x && f.getY() == y)
                 .findFirst()
@@ -41,15 +41,22 @@ public class CreatureMap {
         return field != null ? field.getCreature() : null;
     }
 
-    public ICreature getCreature(int index) {
+    public VWCreature getCreature(int index) {
         return _map.get(index).getCreature();
+    }
+
+    public CreatureMapField getField(int x, int y) {
+        return _map.stream()
+                .filter(f -> f.getX() == x && f.getY() == y)
+                .findFirst()
+                .orElse(null);
     }
 
     public CreatureMapField getField(int index) {
         return _map.get(index);
     }
 
-    public void addCreature(int x, int y, ICreature creature) throws OccupiedFieldInsertException {
+    public void addCreature(int x, int y, VWCreature creature) throws OccupiedFieldInsertException {
         if (getCreature(x, y) != null)
             throw new OccupiedFieldInsertException("Cannot insert creature on occupied field.");
 

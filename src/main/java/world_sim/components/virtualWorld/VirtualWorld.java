@@ -5,7 +5,7 @@ import javax.swing.*;
 import world_sim.components.virtualWorld.exceptions.InvalidWorldParameterException;
 import world_sim.components.virtualWorld.exceptions.PointOutOfWorldSizeException;
 import world_sim.creatures.CreatureMap;
-import world_sim.creatures.ICreature;
+import world_sim.creatures.VWCreature;
 import world_sim.creatures.exceptions.OccupiedFieldInsertException;
 
 import java.awt.*;
@@ -13,7 +13,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class VirtualWorld {
-    private int _round = 0, _cloneChance = 25;
+    private int _round = 0;
     private final JPanel _gridPanel;
     private final JLabel[][] _gridCells;
     private final CreatureMap _creatureMap;
@@ -41,15 +41,7 @@ public class VirtualWorld {
         _random.setSeed(System.currentTimeMillis());
     }
 
-    public VirtualWorld(int sizeX, int sizeY, int cloneChance) throws InvalidWorldParameterException {
-        this(sizeX, sizeY);
-
-        if (cloneChance < 0 || cloneChance > 100)
-            throw new InvalidWorldParameterException("Clone chance must be from 0 to 100.");
-        _cloneChance = cloneChance;
-    }
-
-    public void setCell(int x, int y, ICreature creature)
+    public void setCell(int x, int y, VWCreature creature)
             throws PointOutOfWorldSizeException, OccupiedFieldInsertException {
         if (x < 0 || x > _creatureMap.getSizeX() - 1 || y < 0 || y > _creatureMap.getSizeY() - 1)
             throw new PointOutOfWorldSizeException("Given cell is out of world bounds.");
@@ -93,56 +85,7 @@ public class VirtualWorld {
                 continue;
 
             var creature = creatureField.getCreature();
-            var creatureOnField = _creatureMap.getCreature(newX, newY);
-            if (creatureOnField == null) {
-                creatureField.setX(newX);
-                creatureField.setY(newY);
-            } else if (creatureOnField.getClass() == creature.getClass()) {
-                if (creatureOnField.getAge() <= 6 || creature.getAge() <= 6)
-                    continue;
-                if (ThreadLocalRandom.current().nextInt(0, 100) < _cloneChance) {
-                    var spawned = false;
-                    int x = -1, y = -1;
-                    while (!spawned && x <= 1) {
-                        var checkX = creatureField.getX() + x;
-                        if (checkX < 0 || checkX >= _creatureMap.getSizeX()) {
-                            x++;
-                            continue;
-                        }
-
-                        while (y <= 1) {
-                            var checkY = creatureField.getY() + y;
-                            if (checkY < 0 || checkY >= _creatureMap.getSizeY()) {
-                                y++;
-                                continue;
-                            }
-
-                            var field = _creatureMap.getCreature(checkX, checkY);
-                            if (field != null) {
-                                y++;
-                                continue;
-                            }
-
-                            _creatureMap.addCreature(checkX, checkY, (ICreature) creature.clone());
-                            spawned = true;
-                            break;
-                        }
-                        x++;
-                    }
-                }
-            } else {
-                var winner = creature.getStrength() == creatureOnField.getStrength()
-                        ? creature
-                        : creature.getStrength() > creatureOnField.getStrength()
-                                ? creature
-                                : creatureOnField;
-
-                if (winner == creature) {
-                    _creatureMap.removeCreature(newX, newY);
-                    creatureField.setX(newX);
-                    creatureField.setY(newY);
-                }
-            }
+            creature.move(creatureField, newX, newY, _creatureMap);
 
             creatureField.getCreature().incrementAge();
         }

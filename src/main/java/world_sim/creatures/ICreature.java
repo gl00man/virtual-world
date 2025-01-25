@@ -1,19 +1,34 @@
-package world_sim.creatures;
+// package world_sim.creatures;
 
-public interface ICreature extends Cloneable {
-    public int getStrength();
+// import world_sim.creatures.exceptions.OccupiedFieldInsertException;
 
-    public void setStrength(int value);
+// public interface VWCreature extends Cloneable {
+// public int getStrength();
 
-    public int getInitiative();
+// public void setStrength(int value);
 
-    public void setInitiative(int value);
+// public int getInitiative();
 
-    public int getAge();
+// public void setInitiative(int value);
 
-    public void incrementAge();
+// public int getAge();
 
-    public String getSymbol();
+// public void incrementAge();
 
-    public Object clone() throws CloneNotSupportedException;
-}
+// public String getSymbol();
+
+// public void move(CreatureMapField creatureField, int newX, int newY,
+// CreatureMap creatureMap)
+// throws OccupiedFieldInsertException, CloneNotSupportedException;
+
+// public void attack(VWCreature victim, CreatureMapField attackerField, int
+// newX, int newY, CreatureMap creatureMap);
+
+// //
+// public VWCreature defend(VWCreature attacker);
+
+// public void multiply(CreatureMapField creatureField, CreatureMap creatureMap)
+// throws OccupiedFieldInsertException, CloneNotSupportedException;
+
+// public Object clone() throws CloneNotSupportedException;
+// }

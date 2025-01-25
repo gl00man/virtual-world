@@ -1,23 +1,23 @@
 package world_sim.creatures;
 
-import world_sim.behaviors.IBehavior;
-import world_sim.creatures.exceptions.InvalidCreatureParameterException;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class VWCreature implements ICreature {
-    protected int _strength, _initiative, _age = 0;
-    IBehavior _behavior;
+import world_sim.creatures.exceptions.InvalidCreatureParameterException;
+import world_sim.creatures.exceptions.OccupiedFieldInsertException;
+
+public abstract class VWCreature implements Cloneable {
+    protected int _strength, _initiative, _age = 0, _cloneChance = 25;
     protected String _symbol;
 
-    public VWCreature(int strength, int initiative, IBehavior behavior, String symbol) {
+    public VWCreature(int strength, int initiative, String symbol) {
         _strength = strength;
         _initiative = initiative;
-        _behavior = behavior;
         _symbol = symbol;
     }
 
-    public VWCreature(int strength, int initiative, int age, IBehavior behavior, String symbol)
+    public VWCreature(int strength, int initiative, int age, int cloneChance, String symbol)
             throws InvalidCreatureParameterException {
-        this(strength, initiative, behavior, symbol);
+        this(strength, initiative, symbol);
         if (age < 0)
             throw new InvalidCreatureParameterException("Creature age cannot be smaller than 0.");
         else if (age >= 6)
@@ -26,41 +26,109 @@ public class VWCreature implements ICreature {
         _age = age;
     }
 
-    @Override
     public int getStrength() {
         return _strength;
     }
 
-    @Override
     public void setStrength(int value) {
         _strength = value;
     }
 
-    @Override
     public int getInitiative() {
         return _initiative;
     }
 
-    @Override
     public void setInitiative(int value) {
         _initiative = value;
     }
 
-    @Override
     public int getAge() {
         return _age;
     }
 
-    @Override
     public void incrementAge() {
         _age++;
         if (_age == 6)
             _symbol = _symbol.toUpperCase();
     }
 
-    @Override
     public String getSymbol() {
-        return _symbol;
+        return _symbol + " " + _initiative + " " + _strength;
+    }
+
+    public void move(CreatureMapField creatureField, int newX, int newY, CreatureMap creatureMap)
+            throws OccupiedFieldInsertException, CloneNotSupportedException {
+        var creature = creatureField.getCreature();
+        var creatureOnField = creatureMap.getCreature(newX, newY);
+        if (creatureOnField == null) {
+            creatureField.setX(newX);
+            creatureField.setY(newY);
+        } else if (creatureOnField.getClass() == creature.getClass()) {
+            if (creatureOnField.getAge() >= 6 || creature.getAge() >= 6) {
+                if (ThreadLocalRandom.current().nextInt(0, 100) < _cloneChance) {
+                    multiply(creatureField, creatureMap);
+                }
+            }
+        } else {
+            attack(creatureOnField, creatureField, newX, newY, creatureMap);
+        }
+
+        creatureField.getCreature().incrementAge();
+    }
+
+    public void attack(VWCreature victim, CreatureMapField attackerField, int newX, int newY, CreatureMap creatureMap) {
+        var winner = victim.defend(this);
+
+        if (winner == this) {
+            creatureMap.removeCreature(newX, newY);
+            attackerField.setX(newX);
+            attackerField.setY(newY);
+        } else if (winner != null) {
+            creatureMap.removeCreature(attackerField.getX(), attackerField.getY());
+            var winnerField = creatureMap.getField(newX, newY);
+            winnerField.setX(attackerField.getX());
+            winnerField.setY(attackerField.getY());
+        }
+    }
+
+    public VWCreature defend(VWCreature attacker) {
+        return getStrength() == attacker.getStrength()
+                ? this
+                : getStrength() > attacker.getStrength()
+                        ? this
+                        : attacker;
+    }
+
+    public void multiply(CreatureMapField creatureField, CreatureMap creatureMap)
+            throws OccupiedFieldInsertException, CloneNotSupportedException {
+        var spawned = false;
+        int x = -1, y = -1;
+        while (!spawned && x <= 1) {
+            var checkX = creatureField.getX() + x;
+            if (checkX < 0 || checkX >= creatureMap.getSizeX()) {
+                x++;
+                continue;
+            }
+
+            while (y <= 1) {
+                var checkY = creatureField.getY() + y;
+                if (checkY < 0 || checkY >= creatureMap.getSizeY()) {
+                    y++;
+                    continue;
+                }
+
+                var field = creatureMap.getCreature(checkX, checkY);
+                if (field != null) {
+                    y++;
+                    continue;
+                }
+
+                creatureMap.addCreature(checkX, checkY, (VWCreature) clone());
+                spawned = true;
+                break;
+            }
+            x++;
+        }
     }
 
     @Override

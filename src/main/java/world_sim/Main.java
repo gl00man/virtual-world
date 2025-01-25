@@ -13,7 +13,7 @@ public class Main {
     private static final String windowTitle = "Maciej Bereda 200808";
     private static final int gridSizeX = 5;
     private static final int gridSizeY = 5;
-    private static ICreature selectedCreature;
+    private static VWCreature selectedCreature;
     private static JFrame mainFrame;
 
     public static void main(String[] args) throws Exception {
@@ -46,8 +46,6 @@ public class Main {
                         int x = (int) cell.getClientProperty("x");
                         int y = (int) cell.getClientProperty("y");
 
-                        System.out.println(x + " " + y);
-
                         try {
                             world.setCell(x, y, selectedCreature);
                         } catch (OccupiedFieldInsertException ex) {
@@ -76,6 +74,18 @@ public class Main {
                         }
                         roundLabel.setText("Round: " + world.getRound());
                         break;
+                    case 70:
+                        selectedCreature = new Fox();
+                        break;
+                    case 71:
+                        selectedCreature = new Guarana();
+                        break;
+                    case 72:
+                        selectedCreature = new Sonchus();
+                        break;
+                    case 77:
+                        selectedCreature = new Mosquito();
+                        break;
                     case 83:
                         selectedCreature = new Sheep();
                         break;
@@ -83,7 +93,7 @@ public class Main {
                         selectedCreature = new Wolf();
                         break;
                 }
-                selectedCreatureLabel.setText("Zwierze: " + selectedCreature.getClass().getSimpleName());
+                selectedCreatureLabel.setText("Zwierze: " + selectedCreature.getSymbol());
             }
         });
 
