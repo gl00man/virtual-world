@@ -1,13 +1,16 @@
 package world_sim;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import world_sim.components.virtualWorld.VirtualWorld;
 import world_sim.creatures.*;
 import world_sim.creatures.exceptions.OccupiedFieldInsertException;
+import world_sim.utils.WorldFileHelper;
 
 import java.awt.BorderLayout;
 import java.awt.event.*;
+import java.io.File;
 
 public class Main {
     private static final String windowTitle = "Maciej Bereda 200808";
@@ -21,8 +24,7 @@ public class Main {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(800, 800);
 
-        setupMenuBar();
-
+        // side panel
         JPanel sidePanel = new JPanel();
         sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
         var roundLabel = new JLabel();
@@ -65,44 +67,25 @@ public class Main {
         mainFrame.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case 32:
-                        try {
-                            world.nextRound();
-                        } catch (OccupiedFieldInsertException | CloneNotSupportedException e1) {
-                            e1.printStackTrace();
-                        }
-                        roundLabel.setText("Round: " + world.getRound());
-                        break;
-                    case 70:
-                        selectedCreature = new Fox();
-                        break;
-                    case 71:
-                        selectedCreature = new Guarana();
-                        break;
-                    case 72:
-                        selectedCreature = new Sonchus();
-                        break;
-                    case 77:
-                        selectedCreature = new Mosquito();
-                        break;
-                    case 83:
-                        selectedCreature = new Sheep();
-                        break;
-                    case 87:
-                        selectedCreature = new Wolf();
-                        break;
+                if (e.getKeyCode() == 32) {
+                    try {
+                        world.nextRound();
+                    } catch (OccupiedFieldInsertException | CloneNotSupportedException e1) {
+                        e1.printStackTrace();
+                    }
+                    roundLabel.setText("Round: " + world.getRound());
+                } else {
+                    char character = (char) e.getKeyCode();
+                    String creatureSymbol = String.valueOf(character);
+                    selectedCreature = VWCreatureFactory.getCreature(creatureSymbol);
+                    var selectedCreatureSymbol = selectedCreature != null ? selectedCreature.getSymbol() : "?";
+                    selectedCreatureLabel.setText("Zwierze: " + selectedCreatureSymbol);
                 }
-                selectedCreatureLabel.setText("Zwierze: " + selectedCreature.getSymbol());
             }
         });
 
-        mainFrame.setVisible(true);
-    }
-
-    private static void setupMenuBar() {
+        // menu bar
         JMenuBar menuBar = new JMenuBar();
-
         JMenu fileMenu = new JMenu("Symulacja");
         JMenuItem newItem = new JMenuItem("Nowa");
         newItem.addActionListener(new ActionListener() {
@@ -113,12 +96,30 @@ public class Main {
             }
         });
 
+        JFileChooser fileChooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("World Files (*.vwrld)", "vwrld");
+        fileChooser.setFileFilter(filter);
+
         JMenuItem openItem = new JMenuItem("Otwórz");
         openItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Opcja 'Nowy' została wybrana.");
-                JOptionPane.showMessageDialog(mainFrame, "Nowy dokument został utworzony!");
+                fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+
+                fileChooser.setDialogTitle("Wybierz plik z zapisem");
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+                int userSelection = fileChooser.showSaveDialog(null);
+
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    try {
+                        world.setMap(WorldFileHelper.ReadWorld(file.getAbsolutePath()));
+                        roundLabel.setText("Runda: 0");
+                    } catch (Exception e1) {
+                        JOptionPane.showMessageDialog(mainFrame, "Nie udało się wczytać pliku.");
+                    }
+                }
             }
         });
 
@@ -126,8 +127,18 @@ public class Main {
         saveItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Opcja 'Nowy' została wybrana.");
-                JOptionPane.showMessageDialog(mainFrame, "Nowy dokument został utworzony!");
+                fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+
+                fileChooser.setDialogTitle("Wybierz miejsce zapisu");
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+                int userSelection = fileChooser.showSaveDialog(null);
+
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    WorldFileHelper.WriteWorld(file.getAbsolutePath(), world.getMap());
+                    JOptionPane.showMessageDialog(mainFrame, "Zapis utworzony pomyślnie!");
+                }
             }
         });
 
@@ -148,5 +159,7 @@ public class Main {
         menuBar.add(fileMenu);
 
         mainFrame.setJMenuBar(menuBar);
+
+        mainFrame.setVisible(true);
     }
 }

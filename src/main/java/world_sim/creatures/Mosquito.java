@@ -2,11 +2,16 @@ package world_sim.creatures;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import world_sim.creatures.exceptions.InvalidCreatureParameterException;
 import world_sim.creatures.exceptions.OccupiedFieldInsertException;
 
 public class Mosquito extends VWCreature {
     public Mosquito() {
-        super(1, 1, "m");
+        super(1, 1, "k");
+    }
+
+    public Mosquito(int strength, int initiative, int age, int cloneChance) throws InvalidCreatureParameterException {
+        super(strength, initiative, age, cloneChance, "k");
     }
 
     @Override

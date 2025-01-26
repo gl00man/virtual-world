@@ -46,6 +46,10 @@ public abstract class VWCreature implements Cloneable {
         return _age;
     }
 
+    public int getCloneChance() {
+        return _cloneChance;
+    }
+
     public void incrementAge() {
         _age++;
         if (_age == 6)
@@ -53,7 +57,7 @@ public abstract class VWCreature implements Cloneable {
     }
 
     public String getSymbol() {
-        return _symbol + " " + _initiative + " " + _strength;
+        return _symbol;
     }
 
     public void move(CreatureMapField creatureField, int newX, int newY, CreatureMap creatureMap)

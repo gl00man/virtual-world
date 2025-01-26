@@ -2,11 +2,16 @@ package world_sim.creatures;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import world_sim.creatures.exceptions.InvalidCreatureParameterException;
 import world_sim.creatures.exceptions.OccupiedFieldInsertException;
 
 public class Guarana extends VWCreature {
     public Guarana() {
         super(0, 0, "g");
+    }
+
+    public Guarana(int strength, int initiative, int age, int cloneChance) throws InvalidCreatureParameterException {
+        super(strength, initiative, age, cloneChance, "g");
     }
 
     @Override

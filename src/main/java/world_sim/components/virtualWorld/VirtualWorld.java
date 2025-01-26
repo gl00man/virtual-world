@@ -16,7 +16,7 @@ public class VirtualWorld {
     private int _round = 0;
     private final JPanel _gridPanel;
     private final JLabel[][] _gridCells;
-    private final CreatureMap _creatureMap;
+    private CreatureMap _creatureMap;
     private final Random _random = new Random();
 
     public VirtualWorld(int sizeX, int sizeY) throws InvalidWorldParameterException {
@@ -60,6 +60,15 @@ public class VirtualWorld {
 
     public JPanel getJPanel() {
         return _gridPanel;
+    }
+
+    public CreatureMap getMap() {
+        return _creatureMap;
+    }
+
+    public void setMap(CreatureMap map) {
+        _creatureMap = map;
+        updateCells();
     }
 
     public int getRound() {

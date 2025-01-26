@@ -2,11 +2,16 @@ package world_sim.creatures;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import world_sim.creatures.exceptions.InvalidCreatureParameterException;
 import world_sim.creatures.exceptions.OccupiedFieldInsertException;
 
 public class Fox extends VWCreature {
     public Fox() {
         super(3, 7, "l");
+    }
+
+    public Fox(int strength, int initiative, int age, int cloneChance) throws InvalidCreatureParameterException {
+        super(strength, initiative, age, cloneChance, "l");
     }
 
     @Override
