@@ -8,11 +8,11 @@ import world_sim.utils.WorldLogger;
 
 public class Human extends VWCreature {
     public Human() {
-        super(3, 5, "czlowiek");
+        super(3, 5, "człowiek");
     }
 
     public Human(int strength, int initiative, int age, int cloneChance) throws InvalidCreatureParameterException {
-        super(strength, initiative, age, cloneChance, "czlowiek");
+        super(strength, initiative, age, cloneChance, "człowiek");
     }
 
     @Override
@@ -39,6 +39,27 @@ public class Human extends VWCreature {
         if (_age % 5 == 0) {
             _strength *= 2;
             _initiative *= 2;
+        }
+    }
+
+    @Override
+    public void attack(VWCreature victim, CreatureMapField attackerField, int newX, int newY, CreatureMap creatureMap) {
+        var winner = victim.defend(this);
+
+        if (winner == this) {
+            creatureMap.removeCreature(newX, newY);
+            attackerField.setX(newX);
+            attackerField.setY(newY);
+            WorldLogger.logMessage(
+                    String.format("%s zabija z procy %s", getSymbol(), victim.getSymbol()));
+        } else if (winner != null) {
+            creatureMap.removeCreature(attackerField.getX(), attackerField.getY());
+            var winnerField = creatureMap.getField(newX, newY);
+            winnerField.setX(attackerField.getX());
+            winnerField.setY(attackerField.getY());
+            WorldLogger.logMessage(
+                    String.format("%s walczy z %s a zwyciezca to %s", getSymbol(), victim.getSymbol(),
+                            winner.getSymbol()));
         }
     }
 }
