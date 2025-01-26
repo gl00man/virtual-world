@@ -7,11 +7,11 @@ import world_sim.creatures.exceptions.OccupiedFieldInsertException;
 
 public class Guarana extends VWCreature {
     public Guarana() {
-        super(0, 0, "g");
+        super(0, 0, "guarana");
     }
 
     public Guarana(int strength, int initiative, int age, int cloneChance) throws InvalidCreatureParameterException {
-        super(strength, initiative, age, cloneChance, "g");
+        super(strength, initiative, age, cloneChance, "guarana");
     }
 
     @Override

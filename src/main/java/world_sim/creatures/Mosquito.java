@@ -4,14 +4,15 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import world_sim.creatures.exceptions.InvalidCreatureParameterException;
 import world_sim.creatures.exceptions.OccupiedFieldInsertException;
+import world_sim.utils.WorldLogger;
 
 public class Mosquito extends VWCreature {
     public Mosquito() {
-        super(1, 1, "k");
+        super(1, 1, "komar");
     }
 
     public Mosquito(int strength, int initiative, int age, int cloneChance) throws InvalidCreatureParameterException {
-        super(strength, initiative, age, cloneChance, "k");
+        super(strength, initiative, age, cloneChance, "komar");
     }
 
     @Override
@@ -51,6 +52,7 @@ public class Mosquito extends VWCreature {
         if (creatureOnField == null) {
             creatureField.setX(newX);
             creatureField.setY(newY);
+            WorldLogger.logMessage(String.format("%s rusza się na pole %s %s", getSymbol(), newX, newY));
         } else if (creatureOnField.getClass() == creature.getClass()) {
             if (creatureOnField.getAge() >= 6 || creature.getAge() >= 6) {
                 if (ThreadLocalRandom.current().nextInt(0, 100) < _cloneChance) {

@@ -4,6 +4,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import world_sim.creatures.exceptions.InvalidCreatureParameterException;
 import world_sim.creatures.exceptions.OccupiedFieldInsertException;
+import world_sim.utils.WorldLogger;
 
 public abstract class VWCreature implements Cloneable {
     protected int _strength, _initiative, _age = 0, _cloneChance = 25;
@@ -67,6 +68,7 @@ public abstract class VWCreature implements Cloneable {
         if (creatureOnField == null) {
             creatureField.setX(newX);
             creatureField.setY(newY);
+            WorldLogger.logMessage(String.format("%s rusza się na pole %s %s", getSymbol(), newX, newY));
         } else if (creatureOnField.getClass() == creature.getClass()) {
             if (creatureOnField.getAge() >= 6 || creature.getAge() >= 6) {
                 if (ThreadLocalRandom.current().nextInt(0, 100) < _cloneChance) {
@@ -93,6 +95,9 @@ public abstract class VWCreature implements Cloneable {
             winnerField.setX(attackerField.getX());
             winnerField.setY(attackerField.getY());
         }
+
+        WorldLogger.logMessage(
+                String.format("%s walczy z %s a zwyciezca to %s", getSymbol(), victim.getSymbol(), winner.getSymbol()));
     }
 
     public VWCreature defend(VWCreature attacker) {
@@ -129,6 +134,7 @@ public abstract class VWCreature implements Cloneable {
 
                 creatureMap.addCreature(checkX, checkY, (VWCreature) clone());
                 spawned = true;
+                WorldLogger.logMessage(String.format("%s rozmnaza się na pole %s %s", getSymbol(), checkX, checkY));
                 break;
             }
             x++;

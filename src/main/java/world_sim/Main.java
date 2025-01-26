@@ -4,9 +4,11 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import world_sim.components.virtualWorld.VirtualWorld;
+import world_sim.components.virtualWorld.exceptions.InvalidWorldParameterException;
 import world_sim.creatures.*;
 import world_sim.creatures.exceptions.OccupiedFieldInsertException;
 import world_sim.utils.WorldFileHelper;
+import world_sim.utils.WorldLogger;
 
 import java.awt.BorderLayout;
 import java.awt.event.*;
@@ -29,10 +31,20 @@ public class Main {
         sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
         var roundLabel = new JLabel();
         var selectedCreatureLabel = new JLabel();
-        selectedCreatureLabel.setText("Zwierze: None");
+        selectedCreatureLabel.setText("Zwierze: ?");
+
+        // log panel
+        JTextArea logTextArea = new JTextArea(10, 30);
+        logTextArea.setEditable(false);
+        logTextArea.setLineWrap(true);
+        logTextArea.setWrapStyleWord(true);
+        JScrollPane logScrollPane = new JScrollPane(logTextArea);
+        WorldLogger.setTextArea((logTextArea));
 
         sidePanel.add(roundLabel);
         sidePanel.add(selectedCreatureLabel);
+        sidePanel.add(new JLabel("Logi:"));
+        sidePanel.add(logScrollPane);
 
         mainFrame.add(sidePanel, BorderLayout.EAST);
 
@@ -60,7 +72,7 @@ public class Main {
             }
         }
 
-        roundLabel.setText("Round: " + world.getRound());
+        roundLabel.setText("Runda: 0");
 
         mainFrame.add(world.getJPanel(), BorderLayout.CENTER);
 
@@ -73,7 +85,7 @@ public class Main {
                     } catch (OccupiedFieldInsertException | CloneNotSupportedException e1) {
                         e1.printStackTrace();
                     }
-                    roundLabel.setText("Round: " + world.getRound());
+                    roundLabel.setText("Runda: " + world.getRound());
                 } else {
                     char character = (char) e.getKeyCode();
                     String creatureSymbol = String.valueOf(character);
@@ -91,8 +103,12 @@ public class Main {
         newItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Opcja 'Nowy' została wybrana.");
-                JOptionPane.showMessageDialog(mainFrame, "Nowy dokument został utworzony!");
+                try {
+                    world.setMap(new CreatureMap(gridSizeX, gridSizeY));
+                } catch (InvalidWorldParameterException e1) {
+                    JOptionPane.showMessageDialog(mainFrame, "Świat ma niepoprawny rozmiar.");
+                }
+                roundLabel.setText("Runda: 0");
             }
         });
 
@@ -161,5 +177,7 @@ public class Main {
         mainFrame.setJMenuBar(menuBar);
 
         mainFrame.setVisible(true);
+
+        mainFrame.requestFocusInWindow();
     }
 }

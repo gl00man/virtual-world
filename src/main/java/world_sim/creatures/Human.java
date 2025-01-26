@@ -6,13 +6,13 @@ import world_sim.creatures.exceptions.InvalidCreatureParameterException;
 import world_sim.creatures.exceptions.OccupiedFieldInsertException;
 import world_sim.utils.WorldLogger;
 
-public class Fox extends VWCreature {
-    public Fox() {
-        super(3, 7, "lis");
+public class Human extends VWCreature {
+    public Human() {
+        super(3, 5, "czlowiek");
     }
 
-    public Fox(int strength, int initiative, int age, int cloneChance) throws InvalidCreatureParameterException {
-        super(strength, initiative, age, cloneChance, "lis");
+    public Human(int strength, int initiative, int age, int cloneChance) throws InvalidCreatureParameterException {
+        super(strength, initiative, age, cloneChance, "czlowiek");
     }
 
     @Override
@@ -35,5 +35,10 @@ public class Fox extends VWCreature {
         }
 
         creatureField.getCreature().incrementAge();
+
+        if (_age % 5 == 0) {
+            _strength *= 2;
+            _initiative *= 2;
+        }
     }
 }

@@ -21,7 +21,7 @@ public class VirtualWorld {
 
     public VirtualWorld(int sizeX, int sizeY) throws InvalidWorldParameterException {
         _creatureMap = new CreatureMap(sizeX, sizeY);
-        _gridPanel = new JPanel(new GridLayout(sizeX, sizeY, 10, 10));
+        _gridPanel = new JPanel(new GridLayout(sizeX, sizeY, 0, 0));
         _gridCells = new JLabel[sizeX][sizeY];
 
         for (var x = 0; x < sizeX; x++) {

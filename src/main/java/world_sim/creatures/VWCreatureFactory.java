@@ -9,14 +9,18 @@ public class VWCreatureFactory {
                 return new Fox();
             case "G":
                 return new Guarana();
-            case "H":
-                return new Sonchus();
             case "M":
+                return new Sonchus();
+            case "K":
                 return new Mosquito();
             case "O":
                 return new Sheep();
             case "W":
                 return new Wolf();
+            case "C":
+                return new Human();
+            case "T":
+                return new Grass();
         }
 
         return null;
@@ -37,6 +41,10 @@ public class VWCreatureFactory {
                 return new Sheep(strength, initiative, age, cloneChance);
             case "W":
                 return new Wolf(strength, initiative, age, cloneChance);
+            case "C":
+                return new Human();
+            case "T":
+                return new Grass();
         }
 
         return null;
