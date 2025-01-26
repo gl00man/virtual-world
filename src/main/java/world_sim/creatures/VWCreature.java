@@ -1,5 +1,7 @@
 package world_sim.creatures;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 import world_sim.creatures.exceptions.InvalidCreatureParameterException;
@@ -110,34 +112,39 @@ public abstract class VWCreature implements Cloneable {
 
     public void multiply(CreatureMapField creatureField, CreatureMap creatureMap)
             throws OccupiedFieldInsertException, CloneNotSupportedException {
+        ArrayList<Integer> fieldsX = new ArrayList<>(Arrays.asList(-1, 0, 1));
         var spawned = false;
-        int x = -1, y = -1;
-        while (!spawned && x <= 1) {
-            var checkX = creatureField.getX() + x;
+        while (fieldsX.size() != 0 && !spawned) {
+            var index = ThreadLocalRandom.current().nextInt(0, fieldsX.size());
+            var checkX = creatureField.getX() + fieldsX.get(index);
             if (checkX < 0 || checkX >= creatureMap.getSizeX()) {
-                x++;
+                fieldsX.remove(index);
                 continue;
             }
 
-            while (y <= 1) {
-                var checkY = creatureField.getY() + y;
+            ArrayList<Integer> fieldsY = new ArrayList<>(Arrays.asList(-1, 0, 1));
+            while (fieldsY.size() != 0) {
+                var indexY = ThreadLocalRandom.current().nextInt(0, fieldsY.size());
+                var checkY = creatureField.getY() + fieldsY.get(indexY);
                 if (checkY < 0 || checkY >= creatureMap.getSizeY()) {
-                    y++;
+                    fieldsY.remove(indexY);
                     continue;
                 }
 
                 var field = creatureMap.getCreature(checkX, checkY);
                 if (field != null) {
-                    y++;
+                    fieldsY.remove(indexY);
                     continue;
                 }
 
                 creatureMap.addCreature(checkX, checkY, (VWCreature) clone());
                 spawned = true;
-                WorldLogger.logMessage(String.format("%s rozmnaza się na pole %s %s", getSymbol(), checkX, checkY));
-                break;
+                WorldLogger.logMessage(String.format("%s rozmnaza się na pole %s %s",
+                        getSymbol(), checkX, checkY));
+
+                fieldsY.remove(indexY);
             }
-            x++;
+            fieldsX.remove(index);
         }
     }
 

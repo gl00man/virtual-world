@@ -26,7 +26,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         mainFrame = new JFrame(windowTitle);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setSize(800, 800);
+        mainFrame.setSize(1600, 800);
 
         // side panel
         JPanel sidePanel = new JPanel();
@@ -47,6 +47,7 @@ public class Main {
                 public void actionPerformed(ActionEvent e) {
                     selectedCreature = VWCreatureFactory.getCreature(button.getText());
                     selectedCreatureLabel.setText(button.getText());
+                    mainFrame.requestFocusInWindow();
                 }
             });
             buttonPanel.add(button);
@@ -103,6 +104,7 @@ public class Main {
                 try {
                     world.nextRound();
                     roundLabel.setText("Runda: " + world.getRound());
+                    mainFrame.requestFocusInWindow();
                 } catch (OccupiedFieldInsertException | CloneNotSupportedException e1) {
                     e1.printStackTrace();
                 }
@@ -140,6 +142,9 @@ public class Main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     world.setMap(new CreatureMap(gridSizeX, gridSizeY));
+                    mainFrame.add(world.getJPanel(), BorderLayout.CENTER);
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
                 } catch (InvalidWorldParameterException e1) {
                     JOptionPane.showMessageDialog(mainFrame, "Świat ma niepoprawny rozmiar.");
                 }
